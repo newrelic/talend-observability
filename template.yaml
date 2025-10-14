@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: New Relic Talend Task Monitoring
+
+Parameters:
+  AwsSecretId:
+    Type: String
+    Description: ARN of AWS Secret containing required Talend/NR keys and secrets
+    Default: "<arn:of:secret>"
+
+Resources:
+  NewRelicTalendPoller:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: NewRelicTalendPoller
+      Runtime: python3.13
+      Handler: main.lambda_handler
+      CodeUri: ./
+      MemorySize: 256
+      Timeout: 120
+      Environment:
+        Variables:
+          TALEND_REGION: "US"                       # US|EU|AP|AU|US-WEST
+          NR_REGION: "US"                           # US|EU
+          DEBUG_LOGGING: "false"                    # Set "true" to enable lambda debug logs
+          COLLECT_TALEND_LOGS: "true"               # Set "false" to disable task execution log polling
+          TALEND_LOG_LEVEL: "INFO"                  # The minimum log level of Talend execution logs to forward to NR - TRACE|DEBUG|INFO|WARN|ERROR|FATAL
+          LOOKBACK_TIME_MIN: 60                     # Minutes to lookback for task executions (default: 60 min) **THIS SHOULD MATCH EVENTBRIDGE CRON SCHEDULE
+          AWS_SECRET_ID: !Ref AwsSecretId           # ARN of AWS Secret containing required Talend/NR keys and secrets
+          AWS_SECRET_REGION: "us-east-1"            # AWS Region AWS Secret resides in
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn:
+              !Ref AwsSecretId
+      Events:
+        ScheduledTrigger:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0/60 * * * ? *)   # Every 60 minutes [If changed, also update the LOOKBACK_TIME_MIN env variable]
+            Enabled: true
+            Name: NewRelicTalendScheduleRule
+            Description: "Invoke NewRelicTalendPoller every 60 minutes"

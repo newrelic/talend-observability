@@ -1,0 +1,4 @@
+aiohttp
+aiohttp-retry
+boto3
+botocore

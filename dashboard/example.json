@@ -1,0 +1,124 @@
+{
+  "name": "Talend Observability",
+  "description": null,
+  "permissions": "PUBLIC_READ_WRITE",
+  "pages": [
+    {
+      "name": "Talend-Example",
+      "description": null,
+      "widgets": [
+        {
+          "title": "Tasks Status",
+          "layout": {
+            "column": 1,
+            "row": 1,
+            "width": 5,
+            "height": 3
+          },
+          "linkedEntityGuids": [],
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM talendTaskExecutionStats SELECT average(executionDurationSec) as 'Avg Execution Duration (sec)', filter(count(*), where executionStatus not in ('EXECUTION_SUCCESS', 'DISPATCHING_FLOW', 'STARTING_FLOW_EXECUTION')) as 'Execution Failure Count', latest(executionStatus) as 'Last Execution Status' facet taskId since 1 day ago"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Executions",
+          "layout": {
+            "column": 6,
+            "row": 1,
+            "width": 7,
+            "height": 3
+          },
+          "linkedEntityGuids": [],
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM talendTaskExecutionStats SELECT latest(executionStatus) as 'Execution Status', latest(startTimestamp) as 'Start', latest(finishTimestamp) as 'End', latest(executionDurationSec) as 'Duration (sec)', latest(errorMessage) as 'Error' facet executionId since 1 day ago"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Component Details",
+          "layout": {
+            "column": 1,
+            "row": 4,
+            "width": 8,
+            "height": 3
+          },
+          "linkedEntityGuids": [],
+          "visualization": {
+            "id": "viz.table"
+          },
+          "rawConfiguration": {
+            "facet": {
+              "showOtherSeries": false
+            },
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  1
+                ],
+                "query": "FROM talendJobComponentStats SELECT average(component_execution_duration_milliseconds) or 'n/a' as 'Duration (ms)', latest(component_connection_rows_total) or 0 as 'Rows Written', latest(stacktrace) or '' as 'Stack Trace' facet  artifactName, executionId, connector_label, connector_type, target_label, target_connector_type   since 1 day ago LIMIT MAX"
+              }
+            ],
+            "platformOptions": {
+              "ignoreTimeRange": false
+            }
+          }
+        },
+        {
+          "title": "Execution Error Logs",
+          "layout": {
+            "column": 9,
+            "row": 4,
+            "width": 4,
+            "height": 3
+          },
+          "linkedEntityGuids": [],
+          "visualization": {
+            "id": "logger.log-table-widget"
+          },
+          "rawConfiguration": {
+            "nrqlQueries": [
+              {
+                "accountIds": [
+                  0
+                ],
+                "query": "FROM Log SELECT * where logType = 'talend-etl' and severity != 'INFO' since 1 day ago"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variables": []
+}
