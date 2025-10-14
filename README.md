@@ -139,6 +139,7 @@ aws secretsmanager create-secret \
     --region "us-east-1"
 ```
 
+
 ## Configuration
 
 A list of tasks must be input within [tasks.json](./data/tasks.json) before deploying. Each object must contain a task id to fetch executions for, and an associated name or alias for each task id.
