@@ -147,14 +147,14 @@ The following are available function environment variables that can be configure
 
 | Input | Type | Required | Description
 | ----- | ---- | -------- | -----------
-| TALEND_REGION | string | FALSE | Talend region where tasks are running. Can be one of `US|EU|AP|AU|US-WEST`. Defaults to `US`
-| NR_REGION | enum | FALSE | Region of New Relic account. Can be one of `US|EU`. Defaults to `US`
-| DEBUG_LOGGING | string | FALSE | Enables lambda debug logging for troubleshooting. Can be one of `true|false`. Defaullts to `false`
-| COLLECT_TALEND_LOGS | string | FALSE | When `true`, collects all task execution logs. Can be one of `true|false`. Defaults to `true`
-| TALEND_LOG_LEVEL | string | FALSE | The minimum log level of Talend execution logs to forward to NR. Can be one of `TRACE|DEBUG|INFO|WARN|ERROR|FATAL`. Defaults to `WARN`
-| LOOKBACK_TIME_MIN | int | FALSE | Amount of time to lookback for task executions, in minutes. Defaults to `60`
+| TALEND_REGION | string | FALSE | Talend region where tasks are running. Can be one of: _US|EU|AP|AU|US-WEST_. Default: `US`
+| NR_REGION | enum | FALSE | Region of New Relic account. Can be one of _US|EU_. Default: `US`
+| DEBUG_LOGGING | string | FALSE | Enables lambda debug logging for troubleshooting. Can be one of _true|false_. Default: `false`
+| COLLECT_TALEND_LOGS | string | FALSE | When `true`, collects all task execution logs. Can be one of _true|false_. Default: `true`
+| TALEND_LOG_LEVEL | string | FALSE | The minimum log level of Talend execution logs to forward to NR. Can be one of _TRACE|DEBUG|INFO|WARN|ERROR|FATAL_. Default: `WARN`
+| LOOKBACK_TIME_MIN | int | FALSE | Amount of time to lookback for task executions, in minutes. Default: `60`
 | AWS_SECRET_ID | string | TRUE | ARN of AWS Secret containing required Talend/NR keys and secrets. Configured under the `Parameters` section within the SAM template.yaml
-| AWS_SECRET_REGION | string | TRUE | AWS Region that the secret resides in. Defaults to `us-east-1`
+| AWS_SECRET_REGION | string | TRUE | AWS Region that the secret resides in. Default: `us-east-1`
 
 The SAM template also creates an EventBridge rule that executes the Lambda every 60 minutes by default. Configure the cron schedule accordingly based on how often your Talend tasks execute. 
 
