@@ -148,11 +148,11 @@ The following are available function environment variables that can be configure
 
 | Input | Type | Required | Description
 | ----- | ---- | -------- | -----------
-| TALEND_REGION | string | FALSE | Talend region where tasks are running. Can be one of: `US`|`EU`|`AP`|`AU`|`US-WEST`. Default: `US`
-| NR_REGION | enum | FALSE | Region of New Relic account. Can be one of `US`|`EU`. Default: `US`
-| DEBUG_LOGGING | string | FALSE | Enables lambda debug logging for troubleshooting. Can be one of: `true`|`false`. Default: `false`
-| COLLECT_TALEND_LOGS | string | FALSE | When `true`, collects all task execution logs. Can be one of: `true`|`false`. Default: `true`
-| TALEND_LOG_LEVEL | string | FALSE | The minimum log level of Talend execution logs to forward to NR. Can be one of: `TRACE`|`DEBUG`|`INFO`|`WARN`|`ERROR`|`FATAL`. Default: `WARN`
+| TALEND_REGION | string | FALSE | Talend region where tasks are running. Can be one of: `US`\|`EU`\|`AP`\|`AU`\|`US-WEST`. Default: `US`
+| NR_REGION | enum | FALSE | Region of New Relic account. Can be one of `US`\|`EU`. Default: `US`
+| DEBUG_LOGGING | string | FALSE | Enables lambda debug logging for troubleshooting. Can be one of: `true`\|`false`. Default: `false`
+| COLLECT_TALEND_LOGS | string | FALSE | When `true`, collects all task execution logs. Can be one of: `true`\|`false`. Default: `true`
+| TALEND_LOG_LEVEL | string | FALSE | The minimum log level of Talend execution logs to forward to NR. Can be one of: `TRACE`\|`DEBUG`\|`INFO`\|`WARN`\|`ERROR`\|`FATAL`. Default: `WARN`
 | LOOKBACK_TIME_MIN | int | FALSE | Amount of time to lookback for task executions, in minutes. Default: `60`
 | AWS_SECRET_ID | string | TRUE | ARN of AWS Secret containing required Talend/NR keys and secrets. Configured under the `Parameters` section within the SAM template.yaml
 | AWS_SECRET_REGION | string | TRUE | AWS Region that the secret resides in. Default: `us-east-1`
