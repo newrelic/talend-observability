@@ -85,7 +85,7 @@ Retrieves a Talend bearer token via service account id/secret.
 Only used if secret fetched has TALEND_CLIENT_ID/SECRET variables.
 Generates a new token if the cached one is expired or non-existent.
 """
-async def get_talend_token(session: aiohttp.ClientSession, client_id: str, client_secret: str) -> str:
+async def get_talend_token(session: RetryClient, client_id: str, client_secret: str) -> str:
     if token_cache["access_token"] and time.monotonic() < token_cache["expiry_time"]:
         logger.debug("Using cached Talend bearer token.")
         return
@@ -433,7 +433,7 @@ async def main():
 
         # Populate global token cache (User PAT or fetched SA token)
         if service_account_creds == True:
-            await get_talend_token()
+            await get_talend_token(retry_client, talend_client_id, talend_client_secret)
         else:
             token_cache["access_token"] = talend_user_pat
 
