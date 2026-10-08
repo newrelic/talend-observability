@@ -15,17 +15,30 @@ Resources:
       FunctionName: NewRelicTalendPoller
       Runtime: python3.13
       Handler: main.lambda_handler
-      CodeUri: ./
+      CodeUri: src/
       MemorySize: 256
       Timeout: 120
+      EventInvokeConfig:
+        # Retries for failed async invokes (0-2). Default 0: a failed run's window is lost rather than duplicated.
+        # A run fails (and counts in the Lambda Errors metric) on any Talend fetch or New Relic post error, after posting
+        # everything it could collect. A retry reprocesses the same finish window (taken from the EventBridge event time):
+        # it recovers cleanly only if nothing was posted yet (e.g. secret fetch error); otherwise posted data is re-sent as duplicates.
+        MaximumRetryAttempts: 0
       Environment:
         Variables:
           TALEND_REGION: "US"                       # US|EU|AP|AU|US-WEST
           NR_REGION: "US"                           # US|EU
           DEBUG_LOGGING: "false"                    # Set "true" to enable lambda debug logs
           COLLECT_TALEND_LOGS: "true"               # Set "false" to disable task execution log polling
-          TALEND_LOG_LEVEL: "INFO"                  # The minimum log level of Talend execution logs to forward to NR - TRACE|DEBUG|INFO|WARN|ERROR|FATAL
-          LOOKBACK_TIME_MIN: 60                     # Minutes to lookback for task executions (default: 60 min) **THIS SHOULD MATCH EVENTBRIDGE CRON SCHEDULE
+          TALEND_LOG_LEVEL: "WARN"                  # The minimum log level of Talend execution logs to forward to NR - TRACE|DEBUG|INFO|WARN|ERROR|FATAL
+          # SCHEDULE_INTERVAL_MIN must equal the cron interval of ScheduledTrigger below (smaller loses final states, larger duplicates them).
+          # LOOKBACK_TIME_DAYS must exceed your longest task runtime: 1 for jobs up to ~20 h, 2 (default) for up to ~1 day, 3 for up to ~2 days, 8 for up to ~1 week (max 60).
+          # Each run pages through every execution triggered within the lookback, so lower it for high-volume short tasks (see README "Choosing values").
+          SCHEDULE_INTERVAL_MIN: 60                # Minutes between scheduled runs (default: 60) **MUST MATCH THE EVENTBRIDGE CRON SCHEDULE
+          LOOKBACK_TIME_DAYS: 2                     # Days of executions (by trigger time) checked each run for newly finished ones, 1-60 (default: 2)
+          INGEST_COMPLETE_TASKS_ONLY: "false"       # Set "true" to only send final states, skipping in-flight snapshots
+          USE_TALEND_LOG_TS: "false"                # Set "true" to use Talend's log timestamp as the NR log timestamp (default: collection time; falls back to it if missing).
+          TALEND_MAX_REQUESTS_PER_SEC: 8            # Max Talend API requests per second (Talend rate-limits at ~10/s per endpoint and returns 429 above it)
           AWS_SECRET_ID: !Ref AwsSecretId           # ARN of AWS Secret containing required Talend/NR keys and secrets
           AWS_SECRET_REGION: "us-east-1"            # AWS Region AWS Secret resides in
       Policies:
@@ -36,7 +49,7 @@ Resources:
         ScheduledTrigger:
           Type: Schedule
           Properties:
-            Schedule: cron(0/60 * * * ? *)   # Every 60 minutes [If changed, also update the LOOKBACK_TIME_MIN env variable]
+            Schedule: cron(0/60 * * * ? *)   # Every 60 minutes [If changed, also update the SCHEDULE_INTERVAL_MIN env variable]
             Enabled: true
             Name: NewRelicTalendScheduleRule
             Description: "Invoke NewRelicTalendPoller every 60 minutes"
