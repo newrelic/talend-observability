@@ -1,2 +1,13 @@
 .aws-sam*
 samconfig.toml
+.venv
+.env*
+env.json
+out.json
+__pycache__/
+
+.codegraph/
+.claude/
+CLAUDE.md
+
+tmp*

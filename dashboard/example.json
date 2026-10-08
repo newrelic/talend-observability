@@ -28,7 +28,7 @@
                 "accountIds": [
                   0
                 ],
-                "query": "FROM talendTaskExecutionStats SELECT average(executionDurationSec) as 'Avg Execution Duration (sec)', filter(count(*), where executionStatus not in ('EXECUTION_SUCCESS', 'DISPATCHING_FLOW', 'STARTING_FLOW_EXECUTION')) as 'Execution Failure Count', latest(executionStatus) as 'Last Execution Status' facet taskId since 1 day ago"
+                "query": "FROM talendTaskExecutionStats SELECT filter(average(executionDurationSec), WHERE finishTimestamp IS NOT NULL) as 'Avg Execution Duration (sec)', filter(uniqueCount(executionId), where executionStatus not in ('EXECUTION_SUCCESS', 'DISPATCHING_FLOW', 'STARTING_FLOW_EXECUTION', 'EXECUTION_EVENT_RECEIVED') and (status IS NULL OR status not in ('executing', 'dispatching'))) as 'Execution Failure Count', latest(executionStatus) as 'Last Execution Status' facet taskName, taskId since 1 day ago"
               }
             ],
             "platformOptions": {
